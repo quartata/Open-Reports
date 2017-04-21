@@ -86,12 +86,13 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None):
             else:
                 return msg
         else:
+            msg = ''
+            good = good[:amount]
             f = open(filename, 'w')
             f.write(' '.join(ignored))
             f.write('\n')
-            f.write(' '.join(curr))
-            msg = ''
-            good = good[:amount]
+            goodIds = [v['name'] for v in good]
+            f.write(' '.join([v for v in curr if (v in goodIds) or (v in ignored)]))
             if numIgnored:
                 if local:
                     print('Skipped %s ignored reports.'%numIgnored)
