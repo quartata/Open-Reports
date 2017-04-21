@@ -45,7 +45,7 @@ def OpenLinks(reports, local = False):
     else:
         return r.text
 
-def OpenReports(mode='normal', local=False, userID=None, amount=None):
+def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False):
     if userID:
         filename = str(userID) + '.ignorelist'
     else:
@@ -87,7 +87,11 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None):
                 return msg
         else:
             msg = ''
-            good = good[:amount]
+            if amount:
+                if not back:
+                    good = good[:amount]
+                elif amount < len(good):
+                    good = good[len(good) - amount:]
             f = open(filename, 'w')
             f.write(' '.join(ignored))
             f.write('\n')

@@ -11,7 +11,7 @@ import chatexchange.client
 import chatexchange.events
 
 hostID = 'stackoverflow.com'
-roomID = '111347'
+roomID = '1'
 selfID = 7829893
 
 commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ignore_rest',
@@ -19,7 +19,8 @@ commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ig
 
 helpmessage = \
         '    o, open:                    Open all reports not on ignore list\n' + \
-        '    ir, ignore_rest:            Put all unhandled reports from you last querry on your ignore list\n' + \
+        '    `number` [b[back]]:         Open up to `number` reports, fetch from the back of the list if b or back is present\n' + \
+        '    ir, ignore rest:            Put all unhandled reports from you last querry on your ignore list\n' + \
         '    fa, fetch amount:           Display the number of unhandled reports\n' + \
         '    dil, delete ignorelist:     Delete your ignorelist\n' + \
         '    commands:                   Print this help'
@@ -34,11 +35,13 @@ def onMessage(message, client):
         return
 
     amount = None
+    fromTheBack = False
     try:
         if message.target_user_id != selfID:
             return
         userID = message.user.id
         command = _parseMessage(message.content)
+        words = command.split()
         if command in ['a', 'alive']:
             message.message.reply('Yes.')
             return
@@ -49,15 +52,20 @@ def onMessage(message, client):
         if command == 'commands':
             message.room.send_message(helpmessage)
             return
-        if command.isdigit():
+        if words[0].isdigit():
             mode = 'normal'
-            amount = int(command)
+            amount = int(words[0])
+            if len(words) > 1:
+                if len(words) > 2 or words[1] not in ['b', 'back']:
+                    return
+                fromTheBack = True
         else:
             mode = commands[command]
     except:
         return
     
-    message.message.reply(OpenReports.OpenReports(mode, userID=userID, amount=amount))
+    message.message.reply(OpenReports.OpenReports(mode, userID=userID, amount=amount,
+        back=fromTheBack))
 
 
 if 'ChatExchangeU' in os.environ:
