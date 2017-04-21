@@ -17,6 +17,13 @@ selfID = 7829893
 commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ignore_rest',
         'fa':'fetch_amount', 'fetch amount':'fetch_amount'}
 
+helpmessage = \
+        '    o, open:                    Open all reports not on ignore list\n' + \
+        '    ir, ignore_rest:            Put all unhandled reports from you last querry on your ignore list\n' + \
+        '    fa, fetch amount:           Display the number of unhandled reports\n' + \
+        '    dil, delete ignorelist:     Delete your ignorelist\n' + \
+        '    commands:                   Print this help'
+
 def _parseMessage(msg):
     temp = msg.split()
     return ' '.join(v for v in temp if not v[0] == '@').lower()
@@ -34,6 +41,13 @@ def onMessage(message, client):
         command = _parseMessage(message.content)
         if command in ['a', 'alive']:
             message.message.reply('Yes.')
+            return
+        if command in ['dil', 'delete ignorelist']:
+            os.remove(str(userID) + '.ignorelist')
+            message.room.send_message('Ignorelist deleted.')
+            return
+        if command == 'commands':
+            message.room.send_message(helpmessage)
             return
         if command.isdigit():
             mode = 'normal'
