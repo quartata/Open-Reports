@@ -30,7 +30,7 @@ def _parseMessage(msg):
     return ' '.join(v for v in temp if not v[0] == '@').lower()
 
 def onMessage(message, client):
-    if isinstance(message, chatexchange.events.MessagePosted) and message.content == '🚂':
+    if isinstance(message, chatexchange.events.MessagePosted) and message.content in ['🚂', '🚆']:
         message.room.send_message('🚃')
         return
 
