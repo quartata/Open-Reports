@@ -11,7 +11,7 @@ import chatexchange.client
 import chatexchange.events
 
 hostID = 'stackoverflow.com'
-roomID = '111347'
+roomID = '1'
 selfID = 7829893
 
 commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ignore_rest',
@@ -42,6 +42,8 @@ def onMessage(message, client):
         userID = message.user.id
         command = _parseMessage(message.content)
         words = command.split()
+        if command == 'die':
+            os._exit(1)
         if command in ['a', 'alive']:
             message.message.reply('Yes.')
             return
