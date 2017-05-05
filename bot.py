@@ -11,7 +11,7 @@ import chatexchange.client
 import chatexchange.events
 
 hostID = 'stackoverflow.com'
-roomID = '1'
+roomID = '111347'
 selfID = 7829893
 
 commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ignore_rest',
