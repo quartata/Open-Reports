@@ -6,7 +6,6 @@ import logging
 import logging.handlers
 import os
 import OpenReports
-import sys
 
 import chatexchange.client
 import chatexchange.events
@@ -24,7 +23,6 @@ helpmessage = \
         '    ir, ignore rest:            Put all unhandled reports from you last querry on your ignore list\n' + \
         '    fa, fetch amount:           Display the number of unhandled reports\n' + \
         '    dil, delete ignorelist:     Delete your ignorelist\n' + \
-        '    reboot:                     Restart the bot\n' + \
         '    commands:                   Print this help'
 
 def _parseMessage(msg):
@@ -44,8 +42,6 @@ def onMessage(message, client):
         userID = message.user.id
         command = _parseMessage(message.content)
         words = command.split()
-        if command == 'reboot':
-            os.execl(sys.executable, sys.executable, *sys.argv)
         if command in ['a', 'alive']:
             message.message.reply('Yes.')
             return
