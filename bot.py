@@ -42,7 +42,7 @@ def onMessage(message, client):
         userID = message.user.id
         command = _parseMessage(message.content)
         words = command.split()
-        if command == 'die':
+        if command == 'reboot':
             os._exit(1)
         if command in ['a', 'alive']:
             message.message.reply('Yes.')
