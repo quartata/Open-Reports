@@ -19,13 +19,13 @@ commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ig
         'fa':'fetch_amount', 'fetch amount':'fetch_amount'}
 
 helpmessage = \
-       ['    o, open:                    Open all reports not on ignore list\n' + \
+        '    o, open:                    Open all reports not on ignore list\n' + \
         '    `number` [b[back]]:         Open up to `number` reports, fetch from the back of the list if b or back is present\n' + \
         '    ir, ignore rest:            Put all unhandled reports from you last querry on your ignore list\n' + \
         '    fa, fetch amount:           Display the number of unhandled reports\n' + \
-        '    dil, delete ignorelist:     Delete your ignorelist',
+        '    dil, delete ignorelist:     Delete your ignorelist\n' + \
         '    reboot:                     Restart the bot\n' + \
-        '    commands:                   Print this help']
+        '    commands:                   Print this help'
 
 def _parseMessage(msg):
     temp = msg.split()
@@ -54,8 +54,7 @@ def onMessage(message, client):
             message.room.send_message('Ignorelist deleted.')
             return
         if command == 'commands':
-            for m in helpmessage:
-                message.room.send_message(helpmessage)
+            message.room.send_message(helpmessage)
             return
         if words[0].isdigit():
             mode = 'normal'
