@@ -31,7 +31,7 @@ def _parseMessage(msg):
 
 def onMessage(message, client):
     if isinstance(message, chatexchange.events.MessagePosted) and message.content in ['🚂', '🚆']:
-        message.room.send_message('🚃')
+        message.room.send_message('🚃 by open')
         return
 
     amount = None
@@ -45,13 +45,13 @@ def onMessage(message, client):
         if command == 'reboot open':
             os._exit(1)
         if command in ['a', 'alive']:
-            message.message.reply('Yes.')
+            message.message.reply('[open] Yes.')
             return
         if command in ['dil', 'delete ignorelist']:
             os.remove(str(userID) + '.ignorelist')
             message.room.send_message('Ignorelist deleted.')
             return
-        if command == 'open commands':
+        if command == 'commands open':
             message.room.send_message(helpmessage)
             return
         if words[0].isdigit():
@@ -86,7 +86,7 @@ print('Logged in')
 room = client.get_room(roomID)
 room.join()
 print('Joined room')
-room.send_message('Hi o/')
+room.send_message('[open] Hi o/')
 
 watcher = room.watch(onMessage)
 watcher.thread.join()
