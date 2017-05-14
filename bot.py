@@ -31,7 +31,7 @@ def _parseMessage(msg):
 
 def onMessage(message, client):
     if isinstance(message, chatexchange.events.MessagePosted) and message.content in ['🚂', '🚆']:
-        message.room.send_message('🚃 by open')
+        message.room.send_message('[🚃](https://github.com/SOBotics/Open-Reports)')
         return
 
     amount = None
