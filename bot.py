@@ -23,7 +23,7 @@ helpmessage = \
         '    ir, ignore rest:            Put all unhandled reports from you last querry on your ignore list\n' + \
         '    fa, fetch amount:           Display the number of unhandled reports\n' + \
         '    dil, delete ignorelist:     Delete your ignorelist\n' + \
-        '    commands:                   Print this help'
+        '    reboot open:                Restart the open reports bot'
 
 def _parseMessage(msg):
     temp = msg.split()
@@ -42,7 +42,7 @@ def onMessage(message, client):
         userID = message.user.id
         command = _parseMessage(message.content)
         words = command.split()
-        if command == 'reboot':
+        if command == 'reboot open':
             os._exit(1)
         if command in ['a', 'alive']:
             message.message.reply('Yes.')
@@ -51,7 +51,7 @@ def onMessage(message, client):
             os.remove(str(userID) + '.ignorelist')
             message.room.send_message('Ignorelist deleted.')
             return
-        if command == 'commands':
+        if command == 'open commands':
             message.room.send_message(helpmessage)
             return
         if words[0].isdigit():
