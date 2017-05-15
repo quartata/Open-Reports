@@ -48,7 +48,7 @@ def onMessage(message, client):
         if icommand == 'update open':
             call(['git', 'pull'])
         if command in ['a', 'alive']:
-            message.message.reply('[open] Yes.')
+            message.room.send_message('[open] Yes.')
             return
         if command in ['dil', 'delete ignorelist']:
             os.remove(str(userID) + '.ignorelist')
@@ -69,7 +69,7 @@ def onMessage(message, client):
     except:
         return
     
-    message.message.reply(OpenReports.OpenReports(mode, userID=userID, amount=amount,
+    message.room.send_message(OpenReports.OpenReports(mode, userID=userID, amount=amount,
         back=fromTheBack))
 
 
