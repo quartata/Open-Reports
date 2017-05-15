@@ -6,6 +6,7 @@ import logging
 import logging.handlers
 import os
 import OpenReports
+from subprocess import call
 
 import chatexchange.client
 import chatexchange.events
@@ -44,6 +45,8 @@ def onMessage(message, client):
         words = command.split()
         if command == 'reboot open':
             os._exit(1)
+        if icommand == 'update open':
+            call(['git', 'pull'])
         if command in ['a', 'alive']:
             message.message.reply('[open] Yes.')
             return
