@@ -47,6 +47,7 @@ def onMessage(message, client):
             os._exit(1)
         if icommand == 'update open':
             call(['git', 'pull'])
+            os._exit(1)
         if command in ['a', 'alive']:
             message.room.send_message('[open] Yes.')
             return
