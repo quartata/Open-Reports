@@ -45,7 +45,7 @@ def onMessage(message, client):
         words = command.split()
         if command == 'reboot open':
             os._exit(1)
-        if icommand == 'update open':
+        if command == 'update open':
             call(['git', 'pull'])
             os._exit(1)
         if command in ['a', 'alive']:
