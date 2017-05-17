@@ -55,8 +55,11 @@ def onMessage(message, client):
             os.remove(str(userID) + '.ignorelist')
             message.room.send_message('Ignorelist deleted.')
             return
-        if command == 'commands open':
+        if command in ['commands open', 'commands openreports']:
             message.room.send_message(helpmessage)
+            return
+        if command == 'commands':
+            message.room.send_message('[open] Try `commands open`')
             return
         if words[0].isdigit():
             mode = 'normal'
