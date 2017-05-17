@@ -101,7 +101,7 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
                 if local:
                     print('Skipped %s ignored reports.'%numIgnored)
                 else:
-                    msg = 'Skipped %s ignored %s. '(%numIgnored, _pluralize('report', numIgnored))
+                    msg = 'Skipped %s ignored %s. '%(numIgnored, _pluralize('report', numIgnored))
             report = OpenLinks(good, local)
             if not local:
                 if not good:
