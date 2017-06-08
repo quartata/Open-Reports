@@ -73,8 +73,11 @@ def onMessage(message, client):
     except:
         return
     
-    message.room.send_message(OpenReports.OpenReports(mode, userID=userID, amount=amount,
-        back=fromTheBack))
+    try:
+        message.room.send_message(OpenReports.OpenReports(mode, userID=userID, amount=amount,
+            back=fromTheBack, lowRep=(message.user.reputation < 10000)))
+    except Exception as e:
+        message.room.send_message('Error occurred: ' + str(e) + ' (cc @Baum)')
 
 
 if 'ChatExchangeU' in os.environ:

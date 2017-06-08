@@ -6,8 +6,10 @@ import requests
 import json as js
 import webbrowser
 from argparse import ArgumentParser
+from math import ceil
 
 apiUrl = 'http://reports.socvr.org/api/create-report'
+seApiUrl = 'https://api.stackexchange.com/2.2/posts/'
 
 def _pluralize(word, amount):
     return word if amount == 1 else word + 's'
@@ -45,7 +47,8 @@ def OpenLinks(reports, local = False):
     else:
         return r.text
 
-def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False):
+def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False,
+        lowRep=False):
     if userID:
         filename = str(userID) + '.ignorelist'
     else:
@@ -74,10 +77,23 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
         else:
             return msg
     else:
+        msg = ''
+        if lowRep:
+            nonDeleted = []
+            for i in range(ceil(len(curr) / 100)):
+                r = requests.get(seApiUrl + ';'.join(curr[i*100:(i+1)*100]) + '?site=stackoverflow')
+                r.raise_for_status()
+                data = js.loads(r.text)
+                nonDeleted += [str(v['post_id']) for v in data['items']]
+            numDel = len(curr) - len(nonDeleted)
+            if numDel:
+                msg += 'Ignored %s deleted %s (<10k). '%(numDel, _pluralize('post', numDel))
+            curr = nonDeleted
+            reports = [v for v in reports if v['name'] in curr]
         good = [v for v in reports if not v['name'] in ignored]
         numIgnored = len(curr) - len(good)
         if mode == 'fetch_amount':
-            msg = 'There ' + ('is ' if len(curr) == 1 else 'are ') + str(len(curr)) \
+            msg += 'There ' + ('is ' if len(curr) == 1 else 'are ') + str(len(curr)) \
                     + ' unhandled ' + ('report' if len(curr) == 1 else 'reports') \
                     + ', %s of which '%numIgnored \
                     + ('is' if numIgnored == 1 else 'are') + ' on your ignore list.'
@@ -86,7 +102,6 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
             else:
                 return msg
         else:
-            msg = ''
             if amount:
                 if not back:
                     good = good[:amount]
@@ -101,7 +116,7 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
                 if local:
                     print('Skipped %s ignored reports.'%numIgnored)
                 else:
-                    msg = 'Skipped %s ignored %s. '%(numIgnored, _pluralize('report', numIgnored))
+                    msg += 'Skipped %s ignored %s. '%(numIgnored, _pluralize('report', numIgnored))
             report = OpenLinks(good, local)
             if not local:
                 if not good:
