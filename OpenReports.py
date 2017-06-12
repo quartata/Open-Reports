@@ -81,7 +81,7 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
         if lowRep:
             nonDeleted = []
             for i in range(ceil(len(curr) / 100)):
-                r = requests.get(seApiUrl + ';'.join(curr[i*100:(i+1)*100]) + '?site=stackoverflow')
+                r = requests.get(seApiUrl + ';'.join(curr[i*100:(i+1)*100]) + '?site=stackoverflow&key=Vhtdwbqa)4HYdpgQlVMqTw((')
                 r.raise_for_status()
                 data = js.loads(r.text)
                 nonDeleted += [str(v['post_id']) for v in data['items']]
