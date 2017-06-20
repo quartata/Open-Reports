@@ -87,7 +87,7 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
                 nonDeleted += [str(v['post_id']) for v in data['items']]
             numDel = len(curr) - len(nonDeleted)
             if numDel:
-                msg += 'Ignored %s deleted %s (<10k). '%(numDel, _pluralize('post', numDel))
+                msg += 'Ignored %s deleted %s (<10k pleb). '%(numDel, _pluralize('post', numDel))
             curr = nonDeleted
             reports = [v for v in reports if v['name'] in curr]
         good = [v for v in reports if not v['name'] in ignored]
