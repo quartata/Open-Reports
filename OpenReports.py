@@ -90,8 +90,8 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
             if numDel:
                 plopper = randrange(100)
                 plopStr = 'plop' if plopper == 0 else 'pleb'
-                msg += 'Ignored %s deleted %s (<10k ' + plopStr \
-                        + '). '%(numDel, _pluralize('post', numDel))
+                msg += 'Ignored %s deleted %s (<10k '%(numDel, _pluralize('post', numDel)) \
+                        + plopStr + '). '
             curr = nonDeleted
             reports = [v for v in reports if v['name'] in curr]
         good = [v for v in reports if not v['name'] in ignored]
