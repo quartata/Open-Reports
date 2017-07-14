@@ -98,8 +98,9 @@ room.join()
 print('Joined room')
 room.send_message('[open] Hi o/')
 
-watcher = room.watch(onMessage)
-watcher.thread.join()
+while True:
+    watcher = room.watch(onMessage)
+    watcher.thread.join()
 
 
 client.logout()
