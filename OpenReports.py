@@ -97,10 +97,13 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
         good = [v for v in reports if not v['name'] in ignored]
         numIgnored = len(curr) - len(good)
         if mode == 'fetch_amount':
-            msg += 'There ' + ('is ' if len(curr) == 1 else 'are ') + str(len(curr)) \
-                    + ' unhandled ' + ('report' if len(curr) == 1 else 'reports') \
-                    + ', %s of which '%numIgnored \
-                    + ('is' if numIgnored == 1 else 'are') + ' on your ignore list.'
+            if len(curr) == 0:
+                msg += 'All reports have been tended to.'
+            else:
+                msg += 'There ' + ('is ' if len(curr) == 1 else 'are ') + str(len(curr)) \
+                        + ' unhandled ' + ('report' if len(curr) == 1 else 'reports') \
+                        + ', %s of which '%numIgnored \
+                        + ('is' if numIgnored == 1 else 'are') + ' on your ignore list.'
             if local:
                 print (msg)
             else:
