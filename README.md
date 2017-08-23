@@ -1,6 +1,4 @@
-Currently, this repo only contains a script to open pending Natty reports as a SOCVR report. It can be used as a local stand-alone tool as ./OpenReports or as a bot that runs in SOBotics.
-
-For usage of the stand-alone script, please refer to the built-in help.
+A simple bot for more convenient review of Natty reports. The main features are convenient opening several reports at the same time, maintaining a personal ignorelist and automatically skipping deleted posts if you are <10k.
 
 The bot currently understands the following commands:
 

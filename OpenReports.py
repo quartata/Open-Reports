@@ -33,27 +33,18 @@ def _buildReport(reports):
     ret['posts'] = posts
     return ret
 
-def OpenLinks(reports, local = False):
+def OpenLinks(reports):
     if len(reports) == 0:
-        if local:
-            print('All reports have been tended to.')
         return None
     report = _buildReport(reports)
     
     r = requests.post(apiUrl, data=js.dumps(report))
     r.raise_for_status()
-    if local:
-        webbrowser.open(r.text)
-        return None
-    else:
-        return r.text
+    return r.text
 
-def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False,
+def OpenReports(mode='normal', userID, amount=None, back=False,
         lowRep=False):
-    if userID:
-        filename = str(userID) + '.ignorelist'
-    else:
-        filename = '.report_data.txt'
+    filename = str(userID) + '.ignorelist'
     reports = _getData()
     curr = [v['name'] for v in reports]
 
@@ -73,10 +64,7 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
         f.write('\n')
         f.write(' '.join(last))
         msg = str(len(newIgnored)) + ' %s in ignore list.'%_pluralize('report', len(newIgnored))
-        if local:
-            print(msg)
-        else:
-            return msg
+        return msg
     else:
         msg = ''
         if lowRep:
@@ -104,10 +92,7 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
                         + ' unhandled ' + ('report' if len(curr) == 1 else 'reports') \
                         + ', %s of which '%numIgnored \
                         + ('is' if numIgnored == 1 else 'are') + ' on your ignore list.'
-            if local:
-                print (msg)
-            else:
-                return msg
+            return msg
         else:
             if amount:
                 if not back:
@@ -120,30 +105,11 @@ def OpenReports(mode='normal', local=False, userID=None, amount=None, back=False
             goodIds = [v['name'] for v in good]
             f.write(' '.join([v for v in curr if (v in goodIds) or (v in ignored)]))
             if numIgnored:
-                if local:
-                    print('Skipped %s ignored reports.'%numIgnored)
-                else:
-                    msg += 'Skipped %s ignored %s. '%(numIgnored, _pluralize('report', numIgnored))
-            report = OpenLinks(good, local)
-            if not local:
-                if not good:
-                    msg += 'All reports have been tended to.'
-                else:
-                    msg += 'Opened %s [report%s](%s).'%(len(good),'' if len(good) == 1 else 's', report)
+                msg += 'Skipped %s ignored %s. '%(numIgnored, _pluralize('report', numIgnored))
+            report = OpenLinks(good)
+            if not good:
+                msg += 'All reports have been tended to.'
+            else:
+                msg += 'Opened %s [report%s](%s).'%(len(good),'' if len(good) == 1 else 's', report)
             return msg
 
-if __name__ == '__main__':
-    parser = ArgumentParser(description = 'Interface to Natty reports')
-    parser.add_argument('-ir', '--ignore-rest', action='store_true',
-                    help='Add all unhandled reports from the last batch to your ignore list')
-    parser.add_argument('-fa', '--fetch-amount', action='store_true',
-                    help='Only show the number of reports')
-    args = parser.parse_args()
-
-    mode = 'normal'
-    if args.ignore_rest:
-        mode = 'ignore_rest'
-    if args.fetch_amount:
-        mode = 'fetch_amount'
-
-    OpenReports(mode, True)
