@@ -6,14 +6,24 @@ import logging
 import logging.handlers
 import os
 import OpenReports
+import time
+import traceback
 from subprocess import call
+from threading import Thread
 
 import chatexchange.client
 import chatexchange.events
 
-hostID = 'stackoverflow.com'
-roomID = '111347'
-selfID = 7829893
+rooms = [
+    {
+        'hostID' : 'stackoverflow.com',
+        'roomID' : '111347',
+    },
+    {
+        'hostID' : 'stackexchange.com',
+        'roomID' : '54445',
+    }
+]
 
 commands = {'o':'normal', 'open':'normal', 'ir':'ignore_rest', 'ignore rest':'ignore_rest',
         'fa':'fetch_amount', 'fetch amount':'fetch_amount'}
@@ -38,7 +48,7 @@ def onMessage(message, client):
     amount = None
     fromTheBack = False
     try:
-        if message.target_user_id != selfID:
+        if message.target_user_id != client.get_me().id:
             return
         userID = message.user.id
         command = _parseMessage(message.content)
@@ -74,11 +84,23 @@ def onMessage(message, client):
         return
     
     try:
-        message.room.send_message(OpenReports.OpenReports(mode, userID=userID, amount=amount,
-            back=fromTheBack, lowRep=(message.user.reputation < 10000)))
+        message.room.send_message(OpenReports.OpenReports(mode, message.user, client, amount=amount,
+            back=fromTheBack))
     except Exception as e:
         message.room.send_message('Error occurred: ' + str(e) + ' (cc @Baum)')
+        traceback.print_exc()
 
+def WatchRoom(mail, password, room):
+    client = chatexchange.client.Client(room['hostID'])
+    client.login(email, password)
+
+    room = client.get_room(room['roomID'])
+    room.join()
+    room.send_message('[open] Hi o/')
+
+    watcher = room.watch(onMessage)
+
+    return client, room, watcher
 
 if 'ChatExchangeU' in os.environ:
     email = os.environ['ChatExchangeU']
@@ -89,19 +111,10 @@ if 'ChatExchangeP' in os.environ:
 else:
     password = input("Password: ")
 
-client = chatexchange.client.Client(hostID)
-client.login(email, password)
-print('Logged in')
-
-room = client.get_room(roomID)
-room.join()
-print('Joined room')
-room.send_message('[open] Hi o/')
 
 while True:
-    watcher = room.watch(onMessage)
-    watcher.thread.join()
+    watchers = [WatchRoom(email, password, r) for r in rooms]
+    for w in watchers:
+        w[2].thread.join()
 
-
-client.logout()
 
