@@ -62,7 +62,7 @@ def onMessage(message, client):
             message.room.send_message('[open] Yes.')
             return
         if command in ['dil', 'delete ignorelist']:
-            os.remove(str(userID) + '.ignorelist')
+            os.remove(str(userID) + client.host + '.ignorelist')
             message.room.send_message('Ignorelist deleted.')
             return
         if command in ['commands open', 'commands openreports']:
