@@ -41,7 +41,7 @@ def _parseMessage(msg):
     return ' '.join(v for v in temp if not v[0] == '@').lower()
 
 def onMessage(message, client):
-    if message.room.id not in ['111347', '54445']:
+    if str(message.room.id) not in ['111347', '54445']:
         return
     if isinstance(message, chatexchange.events.MessagePosted) and message.content in ['🚂', '🚆', '🚄']:
         message.room.send_message('[🚃](https://github.com/SOBotics/Open-Reports)')
