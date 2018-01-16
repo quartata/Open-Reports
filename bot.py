@@ -100,7 +100,7 @@ def WatchRoom(mail, password, room):
     room.join()
     room.send_message('[open] Hi o/')
 
-    watcher = room.watch(onMessage)
+    watcher = room.watch_socket(onMessage)
 
     return client, room, watcher
 
