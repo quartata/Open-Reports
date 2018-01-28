@@ -10,30 +10,48 @@ from argparse import ArgumentParser
 from math import ceil
 import shelve
 
-apiUrls = {'stackoverflow.com' : 'http://samserver.bhargavrao.com:8000/napi/api/reports/all/',
-        'stackexchange.com' : 'http://samserver.bhargavrao.com:8000/napi/api/reports/all/au'}
-seApiUrl = 'https://api.stackexchange.com/2.2/posts/'
-socvrAPI = 'http://reports.socvr.org/api/create-report' 
-siteNames = {'stackoverflow.com' : 'stackoverflow', 'stackexchange.com' : 'askubuntu'}
+MS_KEY = "f6e2b03cd2dcae440f61a2e896acc8d89b5a3da0a4d9f87ec7711b0650ecd967"
+POSTS_FILTER = "HKMJOLHGHMKNOGFGFINLMFLONHKFHJ"
+REASONS_FILTER = "GFLHKIHJKNLJKLMFGMIFNGL"
+
+socvrAPI = 'http://reports.socvr.org/api/create-report'
 
 def _pluralize(word, amount):
     return word if amount == 1 else word + 's'
 
-def _getData(host):
-    remote = requests.get(apiUrls[host])
+def _getData():
+    remote = requests.get("https://metasmoke.erwaysoftware.com/api/v2.0/posts",
+                          params={"key": MS_KEY, "filter": POSTS_FILTER, "page": 1, "per_page": 100})
     remote.raise_for_status()
 
-    data = js.loads(remote.text)
-    return data['items']
+    data = remote.json()
+    reports = []
+
+    for data in data['items']:
+        if not (data['is_fp'] or data['is_naa'] or (data['is_tp'] and (data['revision_count'] or data['deleted_at']))):
+            reports.append(data)
+
+    return reports
+
 
 def _buildReport(reports):
     ret = {'botName' : 'OpenReportsScript'}
     posts = []
+
     for v in reports:
-        reasons = ', '.join(r['reasonName'] for r in v['reasons'])
-        posts.append([{'id':'title', 'name':v['name'], 'value':v['link'], 'specialType':'link'},
-            {'id':'score', 'name':'NAA Score', 'value':v['naaValue']},
+        remote = requests.get("https://metasmoke.erwaysoftware.com/api/v2.0/posts/%d/reasons" % v['id'],
+                              params={"key": MS_KEY, "filter": REASONS_FILTER})
+        remote.raise_for_status()
+
+        reason_list = remote.json()["items"]
+
+        reasons = ', '.join(r['reason_name'] for r in reason_list)
+        score = sum(r['weight'] for r in reason_list)
+
+        posts.append([{'id':'title', 'name': v['title'], 'value':v['link'], 'specialType':'link'},
+            {'id':'score', 'name':'Autoflag Weight', 'value':score},
             {'id':'reasons', 'name':'Reasons', 'value':reasons}])
+
     ret['posts'] = posts
     return ret
 
@@ -48,14 +66,11 @@ def OpenLinks(reports):
 
 def OpenReports(mode, user, client, amount=None, back=False):
     userID = user.id
-    lowRep= user.reputation < 10000
 
     filename = str(userID) + client.host + '.ignorelist'
-    reports = _getData(client.host)
-    curr = [v['name'] for v in reports]
+    curr = _getData()
 
     with shelve.open(filename) as db:
-
         try:
             ignored = db['ignored']
             last = db['last']
@@ -64,31 +79,17 @@ def OpenReports(mode, user, client, amount=None, back=False):
             last = []
 
         if mode == 'ignore_rest':
-            newIgnored = [v for v in last if v in curr]
+            newIgnored = [v['id'] for v in last if v in curr]
             db['ignored'] = newIgnored
             db['last'] = last
             msg = str(len(newIgnored)) + ' %s in ignore list.'%_pluralize('report', len(newIgnored))
             return msg
         else:
             msg = ''
-            if lowRep:
-                nonDeleted = []
-                for i in range(ceil(len(curr) / 100)):
-                    r = requests.get(seApiUrl + ';'.join(curr[i*100:(i+1)*100]) + '?site=' \
-                            + siteNames[client.host] + '&key=Vhtdwbqa)4HYdpgQlVMqTw((')
-                    r.raise_for_status()
-                    data = js.loads(r.text)
-                    nonDeleted += [str(v['post_id']) for v in data['items']]
-                numDel = len(curr) - len(nonDeleted)
-                if numDel:
-                    plopper = randrange(100)
-                    plopStr = 'plop' if plopper == 0 else 'pleb'
-                    msg += 'Ignored %s deleted %s (<10k '%(numDel, _pluralize('post', numDel)) \
-                            + plopStr + '). '
-                curr = nonDeleted
-                reports = [v for v in reports if v['name'] in curr]
-            good = [v for v in reports if not v['name'] in ignored]
+
+            good = [v for v in curr if not v['id'] in ignored]
             numIgnored = len(curr) - len(good)
+
             if mode == 'fetch_amount':
                 if len(curr) == 0:
                     msg += 'All reports have been tended to.'
@@ -104,8 +105,8 @@ def OpenReports(mode, user, client, amount=None, back=False):
                         good = good[:amount]
                     elif amount < len(good):
                         good = good[len(good) - amount:]
-                goodIds = [v['name'] for v in good]
-                last = [v for v in curr if (v in goodIds) or (v in ignored)]
+                goodIds = [v['id'] for v in good]
+                last = [v for v in curr if (v['id'] in goodIds) or (v['id'] in ignored)]
 
                 db['last'] = last
                 db['ignored'] = ignored

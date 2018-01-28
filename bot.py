@@ -16,12 +16,8 @@ import chatexchange.events
 
 rooms = [
     {
-        'hostID' : 'stackoverflow.com',
-        'roomID' : '111347',
-    },
-    {
         'hostID' : 'stackexchange.com',
-        'roomID' : '54445',
+        'roomID' : '11540',
     }
 ]
 
@@ -41,8 +37,6 @@ def _parseMessage(msg):
     return ' '.join(v for v in temp if not v[0] == '@').lower()
 
 def onMessage(message, client):
-    if str(message.room.id) not in ['111347', '54445']:
-        return
     if isinstance(message, chatexchange.events.MessagePosted) and message.content in ['🚂', '🚆', '🚄']:
         message.room.send_message('[🚃](https://github.com/SOBotics/Open-Reports)')
         return
@@ -111,7 +105,7 @@ else:
 if 'ChatExchangeP' in os.environ:
     password = os.environ['ChatExchangeP']
 else:
-    password = input("Password: ")
+    password = getpass.getpass("Password: ")
 
 
 while True:
